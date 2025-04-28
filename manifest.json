@@ -1,7 +1,7 @@
 {
   "name": "Qualité SQCDP - Visualisation Q",
-  "vendor": "TonNom",
-  "version": "1",
+  "vendor": "Flavien Aviaco",
+  "version": "1.0",
   "id": "sqcdp_quality_q",
   "description": "Visualisation dynamique SQCDP pour suivi Qualité sous forme de Q avec Asana",
   "components": [
@@ -12,8 +12,8 @@
       "useCustomElement": true
     }
   ],
-  "supportEmail": "tonemail@example.com",
-  "homepage": "https://tonsiteweb.com",
+  "supportEmail": "flavien@example.com",
+  "homepage": "https://flavienaviaco.github.io/Looker-Visualizations/",
   "logoUrl": "https://upload.wikimedia.org/wikipedia/commons/4/4e/Letter_Q.svg",
   "theme": {
     "primaryColor": "#4CAF50",
