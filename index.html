@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Visualisation Qualité - Lettre Q</title>
+  <style>
+    body {
+      background-color: #263238;
+      font-family: 'Roboto', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(8, 40px);
+      grid-template-rows: repeat(5, 40px);
+      gap: 10px;
+      position: relative;
+    }
+    .cell {
+      width: 40px;
+      height: 40px;
+      background-color: #555;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 14px;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+    }
+    .green { background-color: #4CAF50; }
+    .orange { background-color: #FFC107; }
+    .grey { background-color: #757575; }
+  </style>
+</head>
+<body>
+
+<div id="viz" class="grid"></div>
+
+<script>
+const positionMap = {
+  1: [1, 1], 2: [2, 1], 3: [3, 1], 4: [1, 2],
+  5: [2, 2], 6: [3, 2], 7: [4, 1], 8: [5, 1],
+  9: [1, 3], 10: [2, 3], 11: [4, 2], 12: [5, 2],
+  13: [1, 4], 14: [2, 4], 15: [4, 3], 16: [5, 3],
+  17: [1, 5], 18: [2, 5], 19: [4, 4], 20: [5, 4],
+  21: [1, 6], 22: [2, 6], 23: [3, 6], 24: [4, 5],
+  25: [1, 7], 26: [2, 7], 27: [3, 7], 28: [4, 6],
+  29: [1, 8], 30: [2, 8], 31: [4, 7]
+};
+
+// Fonction pour convertir les données entrantes Looker en objet utilisable
+function transformData(data) {
+  const records = {};
+  const today = new Date();
+  
+  for (const row of data.rows) {
+    const taskDate = new Date(row[0]);
+    const type = row[1];
+    const etat = row[2];
+
+    const day = taskDate.getDate();
+    if (!records[day]) {
+      records[day] = { etatList: [] };
+    }
+    records[day].etatList.push(etat);
+  }
+
+  return records;
+}
+
+// Fonction principale de rendu
+function drawViz(dataResponse) {
+  const container = document.getElementById('viz');
+  container.innerHTML = '';
+
+  const records = transformData(dataResponse);
+
+  for (let day = 1; day <= 31; day++) {
+    const cell = document.createElement('div');
+    cell.className = 'cell grey';
+    cell.innerText = day;
+
+    if (records[day]) {
+      const hasNC = records[day].etatList.includes('Non-Conforme');
+      cell.className = hasNC ? 'cell orange' : 'cell green';
+    }
+
+    // Placement dans la grille manuelle
+    const pos = positionMap[day];
+    if (pos) {
+      cell.style.gridColumnStart = pos[0];
+      cell.style.gridRowStart = pos[1];
+      container.appendChild(cell);
+    }
+  }
+}
+
+// Simulation de test Looker pour preview locale
+// À enlever en live Looker Studio
+if (typeof lookerStudio === "undefined") {
+  const fakeData = {
+    rows: [
+      ["2025-04-01", "Qualité", "Conforme"],
+      ["2025-04-10", "Qualité", "Non-Conforme"],
+      ["2025-04-15", "Qualité", "Non-Conforme"],
+      ["2025-04-18", "Qualité", "Conforme"]
+    ]
+  };
+  drawViz(fakeData);
+}
+
+// Branche sur l'API Looker en live
+if (typeof lookerStudio !== "undefined") {
+  lookerStudio.dashboard.onData((dataResponse) => {
+    drawViz(dataResponse);
+  });
+}
+</script>
+
+</body>
+</html>
